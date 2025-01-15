@@ -1,0 +1,27 @@
+<h1>Check-In App</h1>
+
+<div>
+  <h2>Available Members</h2>
+  <select [(ngModel)]="selectedMember">
+    <option *ngFor="let member of members" [value]="member">{{ member }}</option>
+  </select>
+  <button (click)="addToParticipants()">Check In</button>
+</div>
+
+
+<div>
+  <h2>Checked-In Participants</h2>
+  <ul>
+    <li *ngFor="let participant of participants">
+      {{ participant }}
+    </li>
+  </ul>
+</div>
+
+<div>
+  <h2>Participants</h2>
+  <select [(ngModel)]="selectedParticipant">
+    <option *ngFor="let participant of participants" [value]="participant">{{ participant }}</option>
+  </select>
+  <button (click)="removeFromParticipants()">Check Out</button>
+</div>

@@ -1,14 +1,14 @@
 {
   "hosting": {
-    "public": "public",
+    "public": "check-in/dist/check-in/browser",  // Correct build output folder after running 'ng build'
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "node_modules/**"
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/**",
         "destination": "/index.html"
       }
     ]
