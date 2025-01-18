@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';  // Import Ma
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';  // Import MatAutocompleteModule
 import { MatInputModule } from '@angular/material/input';  // Import MatInputModule
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Required for Angular Material
 
 
 
@@ -19,9 +20,10 @@ import { MatInputModule } from '@angular/material/input';  // Import MatInputMod
     MatInputModule, HttpClientModule] // Include required modules
 })
 export class AppComponent implements OnInit {
-  members: string[] = [];
   participants: string[] = [];
-
+  members: string[] = [];
+  filteredMembers: string[] = [];
+  filteredParticipants: string[] = [];
   selectedMember: string = ''; // For check-in selection
   selectedParticipant: string = ''; // For check-out selection
 
@@ -33,12 +35,26 @@ export class AppComponent implements OnInit {
 
   
 
+  filterMembers(): void {
+    const query = this.selectedMember.toLowerCase();
+    this.filteredMembers = this.members.filter(member =>
+      member.toLowerCase().includes(query)
+    );
+  }
+
+  filterParticipants(): void {
+    const query = this.selectedParticipant.toLowerCase();
+    this.filteredParticipants = this.participants.filter(participant =>
+      participant.toLowerCase().includes(query)
+    );
+  }
+
   // Load members from the CSV file
   loadMembersFromCSV(): void {
     this.http.get('assets/members.csv', { responseType: 'text' }).subscribe({
       next: (data) => {
         console.log(data)
-        this.members = data.split('\n').map(line => line.trim()).filter(line => line !== '');
+        this.filteredMembers = this.members = data.split('\n').map(line => line.trim()).filter(line => line !== '');
       },
       error: (err) => {
         console.error('Error loading members from CSV:', err);
@@ -52,12 +68,15 @@ export class AppComponent implements OnInit {
     if (this.selectedMember && !this.participants.includes(this.selectedMember)) {
       this.participants.push(this.selectedMember);
     }
+    this.filterParticipants()
+    this.selectedMember = '';
   }
 
   // Remove selected participant from participants
   removeFromParticipants(): void {
     if (this.selectedParticipant) {
-      this.participants = this.participants.filter(participant => participant !== this.selectedParticipant);
+      this.filteredParticipants = this.participants = this.participants.filter(participant => participant !== this.selectedParticipant);
+      this.selectedParticipant = '';
     }
   }
 }
