@@ -7,9 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';  // Import Ma
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';  // Import MatAutocompleteModule
 import { MatInputModule } from '@angular/material/input';  // Import MatInputModule
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Required for Angular Material
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
-
+interface Member {
+  name: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -26,14 +29,33 @@ export class AppComponent implements OnInit {
   filteredParticipants: string[] = [];
   selectedMember: string = ''; // For check-in selection
   selectedParticipant: string = ''; // For check-out selection
+  arr: Member[] = [];
 
   constructor(private http: HttpClient) {}
+
+
 
   ngOnInit(): void {
     this.loadMembersFromCSV();
   }
 
-  
+  exportToExcel(): void {
+    const formattedData = this.filteredParticipants.map(participant => ({
+      name: participant, // assuming 'name' is the field you want to show
+      // You can include more fields if needed, e.g.
+      // Age: participant.age,
+      // Email: participant.email,
+    }));
+    console.log(formattedData)
+    console.log(this.filteredParticipants)
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Members');
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, 'members.xlsx');
+  }
 
   filterMembers(): void {
     const query = this.selectedMember.toLowerCase();
