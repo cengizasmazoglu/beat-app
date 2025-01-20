@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,18 +9,32 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';  // Impo
 import { MatInputModule } from '@angular/material/input';  // Import MatInputModule
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { Firestore, collection, collectionData, addDoc, getDocs } from '@angular/fire/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
+
 
 interface Member {
   name: string;
 }
+
+
+
+//initializeApp(environment);
+
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
+  providers: [],
   imports: [NgFor, FormsModule, MatFormFieldModule, MatSelectModule, MatAutocompleteModule,
-    MatInputModule, HttpClientModule] // Include required modules
+    MatInputModule
+  ] // Include required modules
 })
 export class AppComponent implements OnInit {
   participants: string[] = [];
@@ -31,13 +45,26 @@ export class AppComponent implements OnInit {
   selectedParticipant: string = ''; // For check-out selection
   arr: Member[] = [];
 
-  constructor(private http: HttpClient) {}
+
+  events$: Observable<any[]>;
+
+  
+  constructor(private http: HttpClient, private firestore: Firestore) {
+    const aCollection = collection(this.firestore, 'items')
+    this.events$ = collectionData(aCollection);
+  }
+
+
 
 
 
   ngOnInit(): void {
     this.loadMembersFromCSV();
+    //this.loadMembersFromFirestore(); // Load members from Firestore instead of CSV
+
   }
+
+ 
 
   exportToExcel(): void {
     const formattedData = this.filteredParticipants.map(participant => ({
@@ -75,7 +102,7 @@ export class AppComponent implements OnInit {
   loadMembersFromCSV(): void {
     this.http.get('assets/members.csv', { responseType: 'text' }).subscribe({
       next: (data) => {
-        console.log(data)
+        //console.log(data)
         this.filteredMembers = this.members = data.split('\n').map(line => line.trim()).filter(line => line !== '');
       },
       error: (err) => {
