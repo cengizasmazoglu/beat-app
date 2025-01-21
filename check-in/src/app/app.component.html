@@ -1,18 +1,81 @@
-<h1>Check-In App</h1>
+<img src="assets/beat-logo.jpg" alt="Beat Logo" style="display: block; margin: 0 auto; width: auto; height: auto; max-width: 100%; max-height: 150px;">
 
-<mat-form-field appearance="fill">
-  <mat-label>Select a member</mat-label>
-  <input type="text" matInput [(ngModel)]="selectedMember" [matAutocomplete]="autoMembers" (input)="filterMembers()">
-  <mat-autocomplete #autoMembers="matAutocomplete" [autoActiveFirstOption]="false">
-    <mat-option *ngFor="let member of filteredMembers" [value]="member">
-      {{ member }}
-    </mat-option>
-  </mat-autocomplete>
-</mat-form-field>
-<button (click)="addToParticipants()">Check In</button>
 
+<h2 style="
+  font-family: 'Poppins', sans-serif; 
+  color: #2C3E50; 
+  text-align: center; 
+  margin-top: 10px; 
+  margin-bottom: 20px; 
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  font-size: 3rem; 
+  font-weight: bold; 
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to right, #EAF2F8, #D4E6F1);">
+  Check-In App
+</h2>
+
+
+
+
+
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 0;">
+  <div style="flex: 1 1 calc(50% - 8px); min-width: 150px;">
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Select a member</mat-label>
+      <input type="text" matInput [(ngModel)]="selectedMember" [matAutocomplete]="autoMembers" (input)="filterMembers()">
+      <mat-autocomplete #autoMembers="matAutocomplete" [autoActiveFirstOption]="false">
+        <mat-option *ngFor="let member of filteredMembers" [value]="member">
+          {{ member }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <button (click)="addToParticipants()" style="width: 100%;">Check In</button>
+  </div>
+
+  <div style="flex: 1 1 calc(50% - 8px); min-width: 150px;">
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Select a participant</mat-label>
+      <input type="text" matInput [(ngModel)]="selectedParticipant" [matAutocomplete]="autoParticipants" (input)="filterParticipants()">
+      <mat-autocomplete #autoParticipants="matAutocomplete" [autoActiveFirstOption]="false">
+        <mat-option *ngFor="let participant of filteredParticipants" [value]="participant">
+          {{ participant }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <button (click)="removeFromParticipants()" style="width: 100%;">Check Out</button>
+  </div>
+</div>
+
+
+
+<div style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px;">
+  <button (click)="exportToExcel()" style="padding-bottom: 10px; font-size: 1rem; border: none; border-radius: 5px; background-color: #4CAF50; color: white; cursor: pointer; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
+    Export to Excel
+  </button>
+</div>
 <div>
-  <h2>Checked-In Participants</h2>
+  <h2 style="
+  font-family: 'Poppins', sans-serif; 
+  margin-top: 10px;
+  margin-bottom: 0px;
+  color: #34495E; 
+  text-align: center; 
+  font-size: 1.8rem; 
+  font-weight: 500;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  display: block; 
+  padding: 5px 10px; 
+  border-radius: 5px; 
+  background: linear-gradient(to right, #EAF2F8, #D4E6F1); 
+  width: 100%; 
+  max-width: 100%; 
+  box-sizing: border-box;">
+  Checked-In Participants
+</h2>
   <ul>
     <li *ngFor="let participant of participants">
       {{ participant }}
@@ -21,15 +84,6 @@
 </div>
 
 
-<mat-form-field appearance="fill">
-  <mat-label>Select a participant</mat-label>
-  <input type="text" matInput [(ngModel)]="selectedParticipant" [matAutocomplete]="autoParticipants" (input)="filterParticipants()">
-  <mat-autocomplete #autoParticipants="matAutocomplete" [autoActiveFirstOption]="false">
-    <mat-option *ngFor="let participant of filteredParticipants" [value]="participant">
-      {{ participant }}
-    </mat-option>
-  </mat-autocomplete>
-</mat-form-field>
-<button (click)="removeFromParticipants()">Check Out</button>
 
-<div><button (click)="exportToExcel()">Export to Excel</button></div>
+
+

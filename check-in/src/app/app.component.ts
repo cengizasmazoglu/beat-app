@@ -9,7 +9,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';  // Impo
 import { MatInputModule } from '@angular/material/input';  // Import MatInputModule
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { Firestore, collection, collectionData, addDoc, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, getDoc, deleteField, updateDoc, arrayRemove, collectionData, doc, addDoc, getDocs, setDoc, arrayUnion } from '@angular/fire/firestore';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
 
   
   constructor(private http: HttpClient, private firestore: Firestore) {
-    const aCollection = collection(this.firestore, 'items')
+    const aCollection = collection(this.firestore, 'events')
     this.events$ = collectionData(aCollection);
   }
 
@@ -59,12 +59,42 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.loadMembersFromCSV();
-    //this.loadMembersFromFirestore(); // Load members from Firestore instead of CSV
+    //this.loadMembersFromCSV();
+    this.loadMembersFromFirestore(); // Load members from Firestore instead of CSV
 
   }
 
- 
+  async addMember(newMember: string) {
+    const eventDocRef = doc(this.firestore, `events/beat_monday_20012025`);
+    try {
+      console.log(newMember)
+      await setDoc(
+        eventDocRef,
+        { members: arrayUnion(newMember) },
+        { merge: true }
+      );
+      console.log('Member added successfully');
+    } catch (error) {
+      console.error('Error adding member:', error);
+    }
+  }
+
+
+  async loadMembersFromFirestore() {
+    const membersCollection = collection(this.firestore, 'members');
+    getDocs(membersCollection).then((snapshot) => {
+      this.members = snapshot.docs.map(doc => doc.data()["name"]); // Assuming each document has a `name` field
+      this.filteredMembers = this.members; // Initialize the filtered list
+    }).catch((error) => {
+      console.error('Error fetching members from Firestore:', error);
+    });
+
+    
+    const eventDoc = doc(this.firestore, `events/beat_monday_20012025`);
+    const docSnap = await getDoc(eventDoc);
+    //console.log(docSnap.get("members"));
+    this.filteredParticipants = this.participants = docSnap.get("members");
+  }
 
   exportToExcel(): void {
     const formattedData = this.filteredParticipants.map(participant => ({
@@ -91,11 +121,11 @@ export class AppComponent implements OnInit {
     );
   }
 
-  filterParticipants(): void {
+  async filterParticipants() {
     const query = this.selectedParticipant.toLowerCase();
     this.filteredParticipants = this.participants.filter(participant =>
       participant.toLowerCase().includes(query)
-    );
+    );  
   }
 
   // Load members from the CSV file
@@ -116,15 +146,29 @@ export class AppComponent implements OnInit {
   addToParticipants(): void {
     if (this.selectedMember && !this.participants.includes(this.selectedMember)) {
       this.participants.push(this.selectedMember);
+      this.addMember(this.selectedMember);
     }
     this.filterParticipants()
     this.selectedMember = '';
+  }
+
+  async deleteMember(eventId: string, member: string) {
+    const eventDocRef = doc(this.firestore, `events/${eventId}`);
+    try {
+      await updateDoc(eventDocRef, {
+        members: arrayRemove(member)
+      });
+      console.log('Field deleted successfully');
+    } catch (error) {
+      console.error('Error deleting field:', error);
+    }
   }
 
   // Remove selected participant from participants
   removeFromParticipants(): void {
     if (this.selectedParticipant) {
       this.filteredParticipants = this.participants = this.participants.filter(participant => participant !== this.selectedParticipant);
+      this.deleteMember('beat_monday_20012025', this.selectedParticipant)
       this.selectedParticipant = '';
     }
   }
