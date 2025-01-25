@@ -20,28 +20,28 @@
 
 
 
-
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 0;">
   <div style="flex: 1 1 calc(50% - 8px); min-width: 150px;">
     <mat-form-field appearance="fill" style="width: 100%;">
       <mat-label>Select a member</mat-label>
       <input type="text" matInput [(ngModel)]="selectedMember" [matAutocomplete]="autoMembers" (input)="filterMembers()">
       <mat-autocomplete #autoMembers="matAutocomplete" [autoActiveFirstOption]="false">
-        <mat-option *ngFor="let member of filteredMembers" [value]="member">
-          {{ member }}
+        <mat-option *ngFor="let member of filteredMembers" [value]="member.name">
+          {{ member.name }}
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
     <button (click)="addToParticipants()" style="width: 100%;">Check In</button>
   </div>
 
+
   <div style="flex: 1 1 calc(50% - 8px); min-width: 150px;">
     <mat-form-field appearance="fill" style="width: 100%;">
       <mat-label>Select a participant</mat-label>
       <input type="text" matInput [(ngModel)]="selectedParticipant" [matAutocomplete]="autoParticipants" (input)="filterParticipants()">
       <mat-autocomplete #autoParticipants="matAutocomplete" [autoActiveFirstOption]="false">
-        <mat-option *ngFor="let participant of filteredParticipants" [value]="participant">
-          {{ participant }}
+        <mat-option *ngFor="let participant of filteredParticipants" [value]="participant.name">
+          {{ participant.name }}
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
@@ -76,14 +76,19 @@
   box-sizing: border-box;">
   Checked-In Participants
 </h2>
+
+<select [(ngModel)]="selectedEvent" (change)="getEvent($event)">
+  <option *ngFor="let event of events" [value]="event.name">
+    {{ event.name }} - {{ event.date }}
+  </option>
+</select>
+
   <ul>
     <li *ngFor="let participant of participants">
-      {{ participant }}
+      {{ participant.name }}
     </li>
   </ul>
 </div>
-
-
 
 
 
